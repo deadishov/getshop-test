@@ -1,16 +1,29 @@
 import { useState } from 'react';
 import './scss/app.scss'
-import ReactPlayer from 'react-player';
 import Banner from './components/Banner';
+import ReactPlayer from 'react-player';
+import NumberScreen from './components/NumberScreen';
 
 
 function App() {
 
   const [bannerOn, setBannerOn] = useState(false)
+  const [numberScreenState, setNumberScreenState] = useState(false)
+
+  const toggleNumberScreen = () => {
+    if (numberScreenState) {
+      setNumberScreenState(!numberScreenState)
+    } else {
+      setBannerOn(!bannerOn)
+      setNumberScreenState(!numberScreenState)
+    }
+  }
 
   return (
     <div className='screen'>
       <ReactPlayer
+        playing={numberScreenState ? false : true}
+        muted={true}
         onPlay={() => {
           const timeout = setTimeout(() => {
             setBannerOn(true);
@@ -22,10 +35,11 @@ function App() {
         width='100%'
         height='100%'
         url='https://www.youtube.com/watch?v=M7FIvfx5J10'
-        playing
+        controls={true}
       />
-      <Banner bannerState={bannerOn} />
-    </div>
+      <Banner toggleScreen={toggleNumberScreen} bannerState={bannerOn} />
+      <NumberScreen toggleScreen={toggleNumberScreen} stateOpen={numberScreenState} />
+    </div >
   );
 }
 
