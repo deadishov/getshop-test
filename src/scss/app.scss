@@ -34,6 +34,18 @@
             color: #fff;
             background: #000;
         }
+
+        &_active {
+            color: #fff;
+            background: #000;
+        }
+
+        &:disabled {
+            &:hover {
+                color: #4E4E4E;
+                background: inherit;
+            }
+        }
     }
 
     &__banner {
@@ -186,6 +198,11 @@
             transition: all .2s ease-in-out;
 
             &:hover {
+                background: #000;
+                color: #fff;
+            }
+
+            &_active {
                 background: #000;
                 color: #fff;
             }
