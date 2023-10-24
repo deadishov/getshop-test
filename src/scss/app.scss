@@ -28,6 +28,7 @@
         font-weight: 500;
         line-height: normal;
         cursor: pointer;
+        outline: none;
         transition: all .3s ease-in-out;
 
         &:hover {
@@ -220,6 +221,7 @@
             cursor: pointer;
 
             input {
+                outline: none;
                 position: relative;
                 width: 40px;
                 height: 40px;

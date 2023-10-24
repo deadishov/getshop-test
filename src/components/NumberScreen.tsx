@@ -9,42 +9,53 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
     const [number, setNumber] = useState('+7(___)___-__-__')
     const [closeBtnHover, setCloseBtnHover] = useState(false)
     const formattedNumber = number.match(/\d/g)
-    const [isBtndisabled, setIsBtnDisabled] = useState(true)
+    const [isBtnDisabled, setIsBtnDisabled] = useState(true)
     const [activeNum, setActiveNum] = useState(0)
+    const [agree, setAgree] = useState(false)
 
     const typeNumber = (num: string) => {
-
-        console.log(isBtndisabled);
-
-
         if (num === 'Enter') {
-            return
+            return;
         }
-        const filteredNum = num.replace(/[^0-9]/g, '_')
+        const filteredNum = num.replace(/[^0-9]/g, '_');
+        const updatedNumber = number.replace(/_/, filteredNum);
+
         if (num === 'Backspace' && formattedNumber && formattedNumber.length > 1) {
-            setIsBtnDisabled(true)
+            setIsBtnDisabled(true);
             if (activeNum === 13) {
-                setActiveNum(12)
+                setActiveNum(12);
             }
-
-            return setNumber(number.replace(/(\d)(?=[^\d]*$)/, '_'))
+            setNumber(number.replace(/(\d)(?=[^\d]*$)/, '_'));
+            acceptNumber(number.replace(/(\d)(?=[^\d]*$)/, '_'));
+            return;
         }
+
         if (filteredNum.length < 2) {
-            setNumber(number.replace(/_/, filteredNum))
+            setNumber(updatedNumber);
         }
 
-        acceptNumber()
+        acceptNumber(updatedNumber);
     }
 
-    const acceptNumber = () => {
-        setIsBtnDisabled(true)
+    const toggleAgree = () => {
+        setAgree(prev => !prev)
+        const updatedFormattedNumber = number.match(/\d/g);
 
-        if (formattedNumber?.length) {
-            if (formattedNumber.length < 11) {
-                setIsBtnDisabled(true)
+        if (updatedFormattedNumber && updatedFormattedNumber.length > 10) {
+            setIsBtnDisabled(false);
+        }
+    }
+
+    const acceptNumber = (updatedNumber: string) => {
+        setIsBtnDisabled(true);
+
+        const updatedFormattedNumber = updatedNumber.match(/\d/g);
+        if (updatedFormattedNumber?.length) {
+            if (updatedFormattedNumber.length < 11) {
+                setIsBtnDisabled(true);
             }
-            if (formattedNumber.length > 10) {
-                setIsBtnDisabled(prev => !prev)
+            if (updatedFormattedNumber.length > 10 && agree) {
+                setIsBtnDisabled(false);
             }
         }
     }
@@ -59,9 +70,11 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     return setNumber('+7(___)___-__-__')
                 }
                 if (activeNum === 12) {
-                    console.log(activeNum);
 
                     return typeNumber('0')
+                }
+                if (activeNum === 14) {
+                    return toggleScreen()
                 }
                 setNumber(number.replace(/_/, String(activeNum)))
             }
@@ -90,21 +103,15 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                 }
 
                 if (event.key === 'ArrowDown' && activeNum > 0 && activeNum !== 13) {
-                    // console.log(isBtndisabled);
-                    // console.log(activeNum);
-                    // console.log(formattedNumber?.length);
-
-
-
                     setActiveNum(activeNum + 3)
 
                     if (activeNum === 10 || activeNum === 11 || activeNum === 12) {
-                        console.log(isBtndisabled);
+                        // console.log(isBtndisabled);
 
-                        if (isBtndisabled) {
+                        if (isBtnDisabled) {
                             setActiveNum(activeNum)
                         }
-                        if (!isBtndisabled) {
+                        if (!isBtnDisabled) {
                             setActiveNum(13)
                         }
                     }
@@ -117,14 +124,21 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     && activeNum !== 11
                     && activeNum !== 13) {
                     setActiveNum(activeNum - 1)
+
+                    if (activeNum === 14) {
+                        setActiveNum(3)
+                    }
                 }
 
-                if (event.key === 'ArrowRight'
-                    && activeNum !== 3
-                    && activeNum !== 6
-                    && activeNum !== 9
-                    && activeNum !== 12) {
+                if (event.key === 'ArrowRight') {
                     setActiveNum(activeNum + 1)
+
+                    if (activeNum === 3
+                        || activeNum === 6
+                        || activeNum === 9
+                        || activeNum === 12) {
+                        setActiveNum(14)
+                    }
 
                     if (activeNum === 10) {
                         setActiveNum(activeNum + 2)
@@ -142,7 +156,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
             document.removeEventListener('keydown', handleKeyDown);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stateOpen, activeNum, number, formattedNumber]);
+    }, [stateOpen, activeNum, number, agree]);
 
 
     return (
@@ -150,7 +164,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
             <img onMouseEnter={() => setCloseBtnHover(true)}
                 onMouseLeave={() => setCloseBtnHover(false)}
                 onClick={toggleScreen}
-                src={closeBtnHover ? closeBlack : closeWhite}
+                src={closeBtnHover || activeNum === 14 ? closeBlack : closeWhite}
                 alt=""
                 className="screen-number__close-btn" />
             <img src={bgImage} alt="background-img" />
@@ -182,13 +196,13 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     </div>
                 </div>
                 <label className="screen-number__checkbox">
-                    <input type="checkbox" />
+                    <input onChange={toggleAgree} type="checkbox" />
                     <span className="screen-number__text screen-number__text_checkbox">Согласие на обработку персональных данных</span>
                 </label>
                 <button
-                    disabled={isBtndisabled}
-                    onClick={acceptNumber}
-                    className={activeNum === 13 && !isBtndisabled ? "button button_active" : "button"}>
+                    disabled={isBtnDisabled}
+                    // onClick={acceptNumber}
+                    className={activeNum === 13 && !isBtnDisabled ? "button button_active" : "button"}>
                     Подтвердить номер
                 </button>
             </div>
