@@ -13,34 +13,38 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
     const [activeNum, setActiveNum] = useState(0)
 
     const typeNumber = (num: string) => {
+
+        console.log(isBtndisabled);
+
+
         if (num === 'Enter') {
             return
         }
         const filteredNum = num.replace(/[^0-9]/g, '_')
         if (num === 'Backspace' && formattedNumber && formattedNumber.length > 1) {
+            setIsBtnDisabled(true)
             if (activeNum === 13) {
                 setActiveNum(12)
             }
-            setIsBtnDisabled(true)
 
             return setNumber(number.replace(/(\d)(?=[^\d]*$)/, '_'))
         }
         if (filteredNum.length < 2) {
             setNumber(number.replace(/_/, filteredNum))
         }
+
         acceptNumber()
     }
 
     const acceptNumber = () => {
-        if (!formattedNumber) {
-            setIsBtnDisabled(true)
-        }
+        setIsBtnDisabled(true)
 
         if (formattedNumber?.length) {
             if (formattedNumber.length < 11) {
                 setIsBtnDisabled(true)
-            } else {
-                setIsBtnDisabled(false)
+            }
+            if (formattedNumber.length > 10) {
+                setIsBtnDisabled(prev => !prev)
             }
         }
     }
@@ -85,15 +89,24 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     setActiveNum(activeNum - 3)
                 }
 
-                if (event.key === 'ArrowDown' && activeNum > 0) {
+                if (event.key === 'ArrowDown' && activeNum > 0 && activeNum !== 13) {
+                    // console.log(isBtndisabled);
+                    // console.log(activeNum);
+                    // console.log(formattedNumber?.length);
+
+
+
                     setActiveNum(activeNum + 3)
 
-                    if (activeNum > 9 && isBtndisabled) {
-                        setActiveNum(activeNum)
-                    }
+                    if (activeNum === 10 || activeNum === 11 || activeNum === 12) {
+                        console.log(isBtndisabled);
 
-                    if (activeNum > 9 && !isBtndisabled) {
-                        setActiveNum(13)
+                        if (isBtndisabled) {
+                            setActiveNum(activeNum)
+                        }
+                        if (!isBtndisabled) {
+                            setActiveNum(13)
+                        }
                     }
                 }
 
@@ -128,7 +141,8 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [stateOpen, activeNum, number]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stateOpen, activeNum, number, formattedNumber]);
 
 
     return (
