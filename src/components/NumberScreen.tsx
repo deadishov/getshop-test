@@ -12,6 +12,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
     const [isBtnDisabled, setIsBtnDisabled] = useState(true)
     const [activeNum, setActiveNum] = useState(0)
     const [agree, setAgree] = useState(false)
+    const [final, setFinal] = useState(false)
 
     const typeNumber = (num: string) => {
         if (num === 'Enter') {
@@ -60,6 +61,20 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         }
     }
 
+    const sendNumber = () => {
+        setFinal(true)
+
+        const timeout = setTimeout(() => {
+            setFinal(false)
+            setActiveNum(0)
+            setNumber('+7(___)___-__-__')
+            setAgree(false)
+
+        }, 3000)
+
+        return () => clearTimeout(timeout)
+    }
+
     useEffect(() => {
         acceptNumber(number);
     }, [number, agree, isBtnDisabled]);
@@ -76,6 +91,9 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                 if (activeNum === 12) {
 
                     return typeNumber('0')
+                }
+                if (activeNum === 13) {
+                    sendNumber()
                 }
                 if (activeNum === 14) {
                     return toggleScreen()
@@ -160,32 +178,32 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         };
     }, [stateOpen, activeNum, number, toggleAgree]);
 
-    useEffect(() => {
-        let timerId: NodeJS.Timeout;
+    // useEffect(() => {
+    //     let timerId: NodeJS.Timeout;
 
 
-        const startTimer = () => {
-            timerId = setTimeout(() => {
-                toggleScreen();
-            }, 10000);
-        };
+    //     const startTimer = () => {
+    //         timerId = setTimeout(() => {
+    //             toggleScreen();
+    //         }, 10000);
+    //     };
 
-        const handleMouseMove = () => {
-            clearTimeout(timerId);
-            startTimer();
-        };
+    //     const handleMouseMove = () => {
+    //         clearTimeout(timerId);
+    //         startTimer();
+    //     };
 
-        if (stateOpen) {
-            startTimer();
+    //     if (stateOpen) {
+    //         startTimer();
 
-            document.addEventListener('mousemove', handleMouseMove);
+    //         document.addEventListener('mousemove', handleMouseMove);
 
-            return () => {
-                clearTimeout(timerId);
-                document.removeEventListener('mousemove', handleMouseMove);
-            };
-        }
-    }, [stateOpen, toggleScreen]);
+    //         return () => {
+    //             clearTimeout(timerId);
+    //             document.removeEventListener('mousemove', handleMouseMove);
+    //         };
+    //     }
+    // }, [stateOpen, toggleScreen]);
 
 
     return (
@@ -198,41 +216,50 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                 className="screen-number__close-btn" />
             <img src={bgImage} alt="background-img" />
             <div className="screen-number__window">
-                <p className="screen-number__title">Введите ваш номер
-                    мобильного телефона</p>
-                <div style={number.charAt(3) === '_' ? { letterSpacing: 2 } : { letterSpacing: 0 }} className="screen-number__phone">{number}</div>
-                <p className="screen-number__text">и с Вами свяжется наш менеждер для дальнейшей консультации</p>
-                <div className="screen-number__keyboard">
-                    <div className="screen-number__nums">
-                        {nums.map((item) => (
-                            <button
-                                key={item}
-                                onClick={() => typeNumber(item)}
-                                className={activeNum === Number(item) ? "screen-number__num screen-number__num_active" : "screen-number__num"}>
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="screen-number__keyboard-bottom">
+                {final ?
+                    <div className="screen-number__final">
+                        <h3 className="screen-number__final-title">ЗАЯВКА ПРИНЯТА</h3>
+                        <p className="screen-number__final-text">Держите телефон под рукой. Скоро с Вами свяжется наш менеджер. </p>
+                    </div> :
+                    <>
+                        <p className="screen-number__title">Введите ваш номер
+                            мобильного телефона</p>
+                        <div style={number.charAt(3) === '_' ? { letterSpacing: 2 } : { letterSpacing: 0 }} className="screen-number__phone">{number}</div>
+                        <p className="screen-number__text">и с Вами свяжется наш менеждер для дальнейшей консультации</p>
+                        <div className="screen-number__keyboard">
+                            <div className="screen-number__nums">
+                                {nums.map((item) => (
+                                    <button
+                                        key={item}
+                                        onClick={() => typeNumber(item)}
+                                        className={activeNum === Number(item) ? "screen-number__num screen-number__num_active" : "screen-number__num"}>
+                                        {item}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="screen-number__keyboard-bottom">
+                                <button
+                                    onClick={() => setNumber('+7(___)___-__-__')}
+                                    className={activeNum === 10 || activeNum === 11 ?
+                                        "screen-number__num screen-number__clear-btn screen-number__num_active"
+                                        : "screen-number__num screen-number__clear-btn"}>Стереть</button>
+                                <button
+                                    onClick={() => typeNumber('0')}
+                                    className={activeNum === 12 ? "screen-number__num screen-number__num_active" : "screen-number__num"}>0</button>
+                            </div>
+                        </div>
+                        <label className="screen-number__checkbox">
+                            <input onChange={toggleAgree} type="checkbox" />
+                            <span className="screen-number__text screen-number__text_checkbox">Согласие на обработку персональных данных</span>
+                        </label>
                         <button
-                            onClick={() => setNumber('+7(___)___-__-__')}
-                            className={activeNum === 10 || activeNum === 11 ?
-                                "screen-number__num screen-number__clear-btn screen-number__num_active"
-                                : "screen-number__num screen-number__clear-btn"}>Стереть</button>
-                        <button
-                            onClick={() => typeNumber('0')}
-                            className={activeNum === 12 ? "screen-number__num screen-number__num_active" : "screen-number__num"}>0</button>
-                    </div>
-                </div>
-                <label className="screen-number__checkbox">
-                    <input onChange={toggleAgree} type="checkbox" />
-                    <span className="screen-number__text screen-number__text_checkbox">Согласие на обработку персональных данных</span>
-                </label>
-                <button
-                    disabled={isBtnDisabled}
-                    className={activeNum === 13 && !isBtnDisabled ? "button button_active" : "button"}>
-                    Подтвердить номер
-                </button>
+                            onClick={sendNumber}
+                            disabled={isBtnDisabled}
+                            className={activeNum === 13 && !isBtnDisabled ? "button button_active" : "button"}>
+                            Подтвердить номер
+                        </button>
+                    </>
+                }
             </div>
         </div>
     )
