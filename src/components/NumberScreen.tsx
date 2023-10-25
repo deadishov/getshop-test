@@ -61,6 +61,10 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
     }
 
     useEffect(() => {
+        acceptNumber(number);
+    }, [number, agree, isBtnDisabled]);
+
+    useEffect(() => {
 
         const handleKeyDown = (event: KeyboardEvent) => {
 
@@ -106,7 +110,6 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     setActiveNum(activeNum + 3)
 
                     if (activeNum === 10 || activeNum === 11 || activeNum === 12) {
-                        // console.log(isBtndisabled);
 
                         if (isBtnDisabled) {
                             setActiveNum(activeNum)
@@ -155,8 +158,34 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stateOpen, activeNum, number, agree]);
+    }, [stateOpen, activeNum, number, toggleAgree]);
+
+    useEffect(() => {
+        let timerId: NodeJS.Timeout;
+
+
+        const startTimer = () => {
+            timerId = setTimeout(() => {
+                toggleScreen();
+            }, 10000);
+        };
+
+        const handleMouseMove = () => {
+            clearTimeout(timerId);
+            startTimer();
+        };
+
+        if (stateOpen) {
+            startTimer();
+
+            document.addEventListener('mousemove', handleMouseMove);
+
+            return () => {
+                clearTimeout(timerId);
+                document.removeEventListener('mousemove', handleMouseMove);
+            };
+        }
+    }, [stateOpen, toggleScreen]);
 
 
     return (
@@ -201,7 +230,6 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                 </label>
                 <button
                     disabled={isBtnDisabled}
-                    // onClick={acceptNumber}
                     className={activeNum === 13 && !isBtnDisabled ? "button button_active" : "button"}>
                     Подтвердить номер
                 </button>

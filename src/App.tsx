@@ -12,10 +12,10 @@ function App() {
 
   const toggleNumberScreen = () => {
     if (numberScreenState) {
-      setNumberScreenState(!numberScreenState)
+      setNumberScreenState(false)
     } else {
-      setBannerOn(!bannerOn)
-      setNumberScreenState(!numberScreenState)
+      setBannerOn(false)
+      setNumberScreenState(true)
     }
   }
 
