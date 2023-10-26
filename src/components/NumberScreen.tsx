@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import bgImage from '../assets/img/number-bg.png'
 import closeWhite from '../assets/img/close-white.svg'
 import closeBlack from '../assets/img/close-black.svg'
+import axios from 'axios'
 
 const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, stateOpen: boolean }) => {
 
@@ -11,6 +12,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
     const formattedNumber = number.match(/\d/g)
     const [isBtnDisabled, setIsBtnDisabled] = useState(true)
     const [activeNum, setActiveNum] = useState(0)
+    const [isValid, setIsValid] = useState<null | Boolean>(null)
     const [agree, setAgree] = useState(false)
     const [final, setFinal] = useState(false)
 
@@ -61,17 +63,45 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         }
     }
 
-    const sendNumber = () => {
-        setFinal(true)
+    const numberSuccess = () => {
+        if (isValid) {
+            setFinal(true)
+        }
 
         const timeout = setTimeout(() => {
-            setFinal(false)
-            resetAll()
+            if (isValid) {
+                setFinal(false)
+                resetAll()
+            }
+            if (!isValid) {
+                console.log(111);
 
+                setIsValid(null)
+                resetAll()
+            }
         }, 3000)
+
 
         return () => clearTimeout(timeout)
     }
+
+    const handleValidation = async () => {
+        const updatedNumber = number.match(/\d/g)?.join('')
+
+        try {
+            const { data } = await axios.get(
+                `http://apilayer.net/validate?access_key=5da06c6f98f700b202c665e8f3c74785&number=${updatedNumber}`
+            );
+
+
+            setIsValid(data.valid);
+            numberSuccess()
+
+
+        } catch (error) {
+            console.error('Error validating phone number:', error);
+        }
+    };
 
     const resetAll = () => {
         setNumber('+7(___)___-__-__')
@@ -97,7 +127,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     return typeNumber('0')
                 }
                 if (activeNum === 13) {
-                    sendNumber()
+                    numberSuccess()
                 }
                 if (activeNum === 14) {
                     return toggleScreen()
@@ -200,7 +230,6 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
 
         if (stateOpen) {
             startTimer();
-
             document.addEventListener('mousemove', handleUserActions);
             document.addEventListener('keydown', handleUserActions)
         } else {
@@ -210,6 +239,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         }
 
         return () => {
+            clearTimeout(timerId);
             document.removeEventListener('mousemove', handleUserActions);
             document.removeEventListener('keydown', handleUserActions);
         };
@@ -237,7 +267,11 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     <>
                         <p className="screen-number__title">Введите ваш номер
                             мобильного телефона</p>
-                        <div style={number.charAt(3) === '_' ? { letterSpacing: 2 } : { letterSpacing: 0 }} className="screen-number__phone">{number}</div>
+                        <div
+                            style={number.charAt(3) === '_' ? { letterSpacing: 2 } : { letterSpacing: 0 }}
+                            className={isValid === false ? "screen-number__phone screen-number__phone_error" : "screen-number__phone"}>
+                            {number}
+                        </div>
                         <p className="screen-number__text">и с Вами свяжется наш менеждер для дальнейшей консультации</p>
                         <div className="screen-number__keyboard">
                             <div className="screen-number__nums">
@@ -261,12 +295,18 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                                     className={activeNum === 12 ? "screen-number__num screen-number__num_active" : "screen-number__num"}>0</button>
                             </div>
                         </div>
-                        <label className="screen-number__checkbox">
-                            <input onChange={toggleAgree} type="checkbox" />
-                            <span className="screen-number__text screen-number__text_checkbox">Согласие на обработку персональных данных</span>
-                        </label>
+                        {
+                            isValid === false ?
+                                <div style={{ height: 52 }}>
+                                    <p className="screen-number__error">Неверно введён номер</p>
+                                </div> :
+                                <label className="screen-number__checkbox">
+                                    <input checked={agree} onChange={toggleAgree} type="checkbox" />
+                                    <span className="screen-number__text screen-number__text_checkbox">Согласие на обработку персональных данных</span>
+                                </label>
+                        }
                         <button
-                            onClick={sendNumber}
+                            onClick={handleValidation}
                             disabled={isBtnDisabled}
                             className={activeNum === 13 && !isBtnDisabled ? "button button_active" : "button"}>
                             Подтвердить номер

@@ -149,6 +149,19 @@
             line-height: normal;
             letter-spacing: 2px;
             text-transform: uppercase;
+
+            &_error {
+                color: #EA0000;
+            }
+        }
+
+        &__error {
+            color: #EA0000;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: normal;
+            text-transform: uppercase;
         }
 
         &__text {
