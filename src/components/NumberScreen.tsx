@@ -74,7 +74,6 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                 resetAll()
             }
             if (!isValid) {
-                console.log(111);
 
                 setIsValid(null)
                 resetAll()
