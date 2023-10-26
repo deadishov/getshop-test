@@ -66,13 +66,17 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
 
         const timeout = setTimeout(() => {
             setFinal(false)
-            setActiveNum(0)
-            setNumber('+7(___)___-__-__')
-            setAgree(false)
+            resetAll()
 
         }, 3000)
 
         return () => clearTimeout(timeout)
+    }
+
+    const resetAll = () => {
+        setNumber('+7(___)___-__-__')
+        setAgree(false)
+        setActiveNum(0)
     }
 
     useEffect(() => {
@@ -178,39 +182,48 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         };
     }, [stateOpen, activeNum, number, toggleAgree]);
 
-    // useEffect(() => {
-    //     let timerId: NodeJS.Timeout;
+    useEffect(() => {
+        let timerId: NodeJS.Timeout | undefined;
 
 
-    //     const startTimer = () => {
-    //         timerId = setTimeout(() => {
-    //             toggleScreen();
-    //         }, 10000);
-    //     };
+        const startTimer = () => {
+            timerId = setTimeout(() => {
+                toggleScreen();
+                resetAll()
+            }, 10000);
+        };
 
-    //     const handleMouseMove = () => {
-    //         clearTimeout(timerId);
-    //         startTimer();
-    //     };
+        const handleUserActions = () => {
+            clearTimeout(timerId);
+            startTimer();
+        };
 
-    //     if (stateOpen) {
-    //         startTimer();
+        if (stateOpen) {
+            startTimer();
 
-    //         document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mousemove', handleUserActions);
+            document.addEventListener('keydown', handleUserActions)
+        } else {
+            clearTimeout(timerId);
+            document.removeEventListener('mousemove', handleUserActions);
+            document.removeEventListener('keydown', handleUserActions)
+        }
 
-    //         return () => {
-    //             clearTimeout(timerId);
-    //             document.removeEventListener('mousemove', handleMouseMove);
-    //         };
-    //     }
-    // }, [stateOpen, toggleScreen]);
+        return () => {
+            document.removeEventListener('mousemove', handleUserActions);
+            document.removeEventListener('keydown', handleUserActions);
+        };
+    }, [stateOpen, toggleScreen]);
 
 
     return (
         <div className={stateOpen ? 'screen-number screen-number_open' : 'screen-number'}>
             <img onMouseEnter={() => setCloseBtnHover(true)}
                 onMouseLeave={() => setCloseBtnHover(false)}
-                onClick={toggleScreen}
+                onClick={() => {
+                    toggleScreen()
+                    resetAll()
+                }}
                 src={closeBtnHover || activeNum === 14 ? closeBlack : closeWhite}
                 alt=""
                 className="screen-number__close-btn" />
