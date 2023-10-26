@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/getshop-test/static/css/main.f906ec00.css",
-    "main.js": "/getshop-test/static/js/main.870b9d58.js",
-    "static/media/number-bg.png": "/getshop-test/static/media/number-bg.956e3652c2c4a37bd763.png",
-    "index.html": "/getshop-test/index.html",
-    "static/media/close-white.svg": "/getshop-test/static/media/close-white.2c6710a84feeb4f25b4090a6005b3eca.svg",
-    "static/media/close-black.svg": "/getshop-test/static/media/close-black.6360df9340c91452d9b0332cbd7a8d52.svg",
-    "main.f906ec00.css.map": "/getshop-test/static/css/main.f906ec00.css.map",
-    "main.870b9d58.js.map": "/getshop-test/static/js/main.870b9d58.js.map"
+    "main.css": "/deadishov.github.io/getshop-test/static/css/main.f906ec00.css",
+    "main.js": "/deadishov.github.io/getshop-test/static/js/main.8927c8e2.js",
+    "static/media/number-bg.png": "/deadishov.github.io/getshop-test/static/media/number-bg.956e3652c2c4a37bd763.png",
+    "index.html": "/deadishov.github.io/getshop-test/index.html",
+    "static/media/close-white.svg": "/deadishov.github.io/getshop-test/static/media/close-white.2c6710a84feeb4f25b4090a6005b3eca.svg",
+    "static/media/close-black.svg": "/deadishov.github.io/getshop-test/static/media/close-black.6360df9340c91452d9b0332cbd7a8d52.svg",
+    "main.f906ec00.css.map": "/deadishov.github.io/getshop-test/static/css/main.f906ec00.css.map",
+    "main.8927c8e2.js.map": "/deadishov.github.io/getshop-test/static/js/main.8927c8e2.js.map"
   },
   "entrypoints": [
     "static/css/main.f906ec00.css",
-    "static/js/main.870b9d58.js"
+    "static/js/main.8927c8e2.js"
   ]
 }
