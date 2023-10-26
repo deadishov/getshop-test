@@ -63,18 +63,18 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         }
     }
 
-    const numberSuccess = () => {
-        if (isValid) {
+    const numberSuccess = (valid: Boolean | null) => {
+
+        if (valid) {
             setFinal(true)
         }
 
         const timeout = setTimeout(() => {
-            if (isValid) {
+            if (valid) {
                 setFinal(false)
                 resetAll()
             }
-            if (!isValid) {
-
+            if (!valid || valid === null) {
                 setIsValid(null)
                 resetAll()
             }
@@ -89,13 +89,11 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
 
         try {
             const { data } = await axios.get(
-                `http://apilayer.net/validate?access_key=5da06c6f98f700b202c665e8f3c74785&number=${updatedNumber}`
+                `http://apilayer.net/api/validate?access_key=324dc04fe14c6e4e39b74e6e78ad5ba4&number=${updatedNumber}`
             );
 
-
             setIsValid(data.valid);
-            numberSuccess()
-
+            numberSuccess(data.valid)
 
         } catch (error) {
             console.error('Error validating phone number:', error);
@@ -126,7 +124,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
                     return typeNumber('0')
                 }
                 if (activeNum === 13) {
-                    numberSuccess()
+                    handleValidation()
                 }
                 if (activeNum === 14) {
                     return toggleScreen()
@@ -209,7 +207,7 @@ const NumberScreen = ({ toggleScreen, stateOpen }: { toggleScreen: () => void, s
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [stateOpen, activeNum, number, toggleAgree]);
+    }, [stateOpen, activeNum, number, toggleAgree, isValid]);
 
     useEffect(() => {
         let timerId: NodeJS.Timeout | undefined;
